@@ -1,6 +1,8 @@
 import { useState, useRef, useCallback } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { products, formatPrice } from "../data/products";
+import { useCart } from "../context/CartContext";
+import { useToast } from "../components/Toast";
 
 function ZoomGallery({ images }) {
   const [active, setActive] = useState(0);
@@ -70,15 +72,14 @@ function ZoomGallery({ images }) {
 
 export default function ProductDetail() {
   const { id } = useParams();
+  const navigate = useNavigate();
   const product = products.find((p) => p.id === Number(id));
-  const [ordered, setOrdered] = useState(false);
-  const [form, setForm] = useState({
-    name: "",
-    phone: "",
-    email: "",
-    address: "",
-    note: "",
-  });
+  const { addToCart, items } = useCart();
+  const { showToast } = useToast();
+  const [qty, setQty] = useState(1);
+  const [justAdded, setJustAdded] = useState(false);
+
+  const inCart = items.find((item) => item.id === product?.id);
 
   if (!product) {
     return (
@@ -91,16 +92,18 @@ export default function ProductDetail() {
     );
   }
 
-  const handleChange = (e) =>
-    setForm({ ...form, [e.target.name]: e.target.value });
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    setOrdered(true);
-    // In production, send to backend/API here
+  const handleAddToCart = () => {
+    addToCart(product, qty);
+    setJustAdded(true);
+    showToast(`${qty} × ${product.name} added to cart`);
+    setTimeout(() => setJustAdded(false), 2000);
   };
 
-  const isValid = form.name && form.phone && form.address;
+  const handleBuyNow = () => {
+    addToCart(product, qty);
+    showToast(`${product.name} added — redirecting to cart`);
+    navigate("/cart");
+  };
 
   return (
     <div className="detail-page">
@@ -118,88 +121,45 @@ export default function ProductDetail() {
           <div className="detail-divider" />
           <p className="detail-desc">{product.description}</p>
 
-          <div className="order-form">
-            {ordered ? (
-              <div className="order-success">
-                <div className="order-success-icon">✓</div>
-                <h3>Order Placed!</h3>
-                <p>
-                  Thank you, {form.name}. We&apos;ll reach out to confirm your
-                  order for the <strong>{product.name}</strong>.
-                </p>
-              </div>
-            ) : (
-              <>
-                <h3 className="order-form-title">Place Your Order</h3>
-                <form onSubmit={handleSubmit}>
-                  <div className="form-row">
-                    <div className="form-group">
-                      <label className="form-label">Full Name *</label>
-                      <input
-                        className="form-input"
-                        name="name"
-                        value={form.name}
-                        onChange={handleChange}
-                        placeholder="Your full name"
-                        required
-                      />
-                    </div>
-                    <div className="form-group">
-                      <label className="form-label">Phone Number *</label>
-                      <input
-                        className="form-input"
-                        name="phone"
-                        value={form.phone}
-                        onChange={handleChange}
-                        placeholder="e.g. 0801 234 5678"
-                        required
-                      />
-                    </div>
-                  </div>
-                  <div className="form-group">
-                    <label className="form-label">Email</label>
-                    <input
-                      className="form-input"
-                      name="email"
-                      type="email"
-                      value={form.email}
-                      onChange={handleChange}
-                      placeholder="your@email.com (optional)"
-                    />
-                  </div>
-                  <div className="form-group">
-                    <label className="form-label">Delivery Address *</label>
-                    <textarea
-                      className="form-textarea"
-                      name="address"
-                      value={form.address}
-                      onChange={handleChange}
-                      placeholder="Full delivery address"
-                      required
-                    />
-                  </div>
-                  <div className="form-group">
-                    <label className="form-label">Order Note</label>
-                    <textarea
-                      className="form-textarea"
-                      name="note"
-                      value={form.note}
-                      onChange={handleChange}
-                      placeholder="Any special requests? (optional)"
-                      rows={2}
-                    />
-                  </div>
-                  <button
-                    type="submit"
-                    className="order-btn"
-                    disabled={!isValid}
-                  >
-                    Order Now — {formatPrice(product.price)}
-                  </button>
-                </form>
-              </>
-            )}
+          <div className="qty-section">
+            <label className="form-label">Quantity</label>
+            <div className="qty-control">
+              <button className="qty-btn" onClick={() => setQty(Math.max(1, qty - 1))}>−</button>
+              <span className="qty-value">{qty}</span>
+              <button className="qty-btn" onClick={() => setQty(qty + 1)}>+</button>
+            </div>
+            <span className="qty-subtotal">{formatPrice(product.price * qty)}</span>
           </div>
+
+          <div className="detail-actions">
+            <button
+              className={`add-cart-btn${justAdded ? " added" : ""}`}
+              onClick={handleAddToCart}
+            >
+              {justAdded ? (
+                <>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                  Added to Cart
+                </>
+              ) : (
+                <>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+                  Add to Cart
+                </>
+              )}
+            </button>
+            <button className="order-btn" onClick={handleBuyNow}>
+              Order Now — {formatPrice(product.price * qty)}
+            </button>
+          </div>
+
+          {inCart && !justAdded && (
+            <p className="in-cart-note">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              {inCart.quantity} already in your cart ·{" "}
+              <Link to="/cart">View Cart</Link>
+            </p>
+          )}
         </div>
       </div>
     </div>
