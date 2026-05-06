@@ -1,13 +1,10 @@
 <?php
 require_once __DIR__ . '/../config/database.php';
 
-// Parse the request
 $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-
-// Extract everything after /api/ regardless of prefix
 $apiPos = strpos($uri, '/api/');
 if ($apiPos !== false) {
-    $uri = substr($uri, $apiPos + 5); // 5 = length of '/api/'
+    $uri = substr($uri, $apiPos + 5);
 } else {
     $uri = '';
 }
@@ -18,7 +15,6 @@ $method = $_SERVER['REQUEST_METHOD'];
 $resource = $segments[0] ?? '';
 $id = $segments[1] ?? null;
 
-// Route to the correct handler
 switch ($resource) {
     case 'auth':
         require_once __DIR__ . '/auth.php';
@@ -34,6 +30,9 @@ switch ($resource) {
         break;
     case 'upload':
         require_once __DIR__ . '/upload.php';
+        break;
+    case 'seed':
+        require_once __DIR__ . '/seed.php';
         break;
     default:
         respond(['error' => 'Endpoint not found'], 404);
