@@ -42,7 +42,7 @@ function getDB() {
 }
 
 // Helper: send JSON response
-function respond($data, $code = 200) {
+function respond(array $data, int $code = 200): void {
     http_response_code($code);
     echo json_encode($data);
     exit();
@@ -54,7 +54,7 @@ function getBody() {
 }
 
 // Helper: simple JWT encode
-function jwtEncode($payload) {
+function jwtEncode(array $payload): string {
     $header = base64_encode(json_encode(['alg' => 'HS256', 'typ' => 'JWT']));
     $payload['exp'] = time() + (60 * 60 * 24); // 24 hours
     $payload = base64_encode(json_encode($payload));
@@ -63,7 +63,7 @@ function jwtEncode($payload) {
 }
 
 // Helper: simple JWT decode
-function jwtDecode($token) {
+function jwtDecode(string $token): ?array {
     $parts = explode('.', $token);
     if (count($parts) !== 3) return null;
 

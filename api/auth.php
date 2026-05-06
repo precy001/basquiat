@@ -1,4 +1,6 @@
 <?php
+$method = $method ?? $_SERVER['REQUEST_METHOD'];
+
 // POST /api/auth — Admin login
 
 if ($method !== 'POST') {

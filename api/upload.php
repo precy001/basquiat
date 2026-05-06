@@ -1,4 +1,6 @@
 <?php
+$method = $method ?? $_SERVER['REQUEST_METHOD'];
+
 // POST /api/upload — upload product images (admin only)
 
 if ($method !== 'POST') {

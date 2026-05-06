@@ -1,4 +1,6 @@
 <?php
+$method = $method ?? $_SERVER['REQUEST_METHOD'];
+$id = $id ?? null;
 $db = getDB();
 
 switch ($method) {
