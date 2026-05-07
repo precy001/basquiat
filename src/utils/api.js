@@ -1,4 +1,4 @@
-const BASE_URL = "http://localhost/basquiat/api";
+const BASE_URL = "https://glamoroushair.com.ng/api";
 
 function getToken() {
   return localStorage.getItem("basquiat_token");
