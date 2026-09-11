@@ -769,7 +769,7 @@ img { display: block; max-width: 100%; }
 .editorial-copy>p:not(.section-label) { max-width:470px; color:#d5d9cc; line-height:1.8; margin-bottom:30px; }
 .text-link { color:var(--gold-light); text-transform:uppercase; letter-spacing:2px; font-size:10px; font-weight:700; }
 .editorial-art { display:grid;place-items:center;background:radial-gradient(circle at 40% 45%,rgba(200,173,103,.15),transparent 55%),#1a2517; }
-.editorial-art span { font-family:var(--font-display);font-size:clamp(50px,7vw,100px);line-height:.8;letter-spacing:5px;color:rgba(232,216,170,.7);text-align:center; }
+.editorial-art span { font-family:var(--font-display);font-size:clamp(50px,7vw,100px);line-height:.8;letter-spacing:5px;color:rgba(232,216,170,.7);transform:rotate(-8deg);text-align:center; }
 .shop-look { display:grid; grid-template-columns:.75fr 1.25fr; max-width:1380px; margin:auto; padding:90px 42px; gap:50px; align-items:center; }
 .shop-look-copy h2 { font-family:var(--font-display);font-size:clamp(44px,5vw,70px);line-height:1;margin:10px 0 20px; }
 .shop-look-copy p:not(.section-label) { color:var(--gray-700);max-width:400px;margin-bottom:28px; }
@@ -800,3 +800,42 @@ img { display: block; max-width: 100%; }
 }
 .receipt-upload{margin:20px 0;padding:16px;background:var(--cream);border:1px dashed var(--gray-300);border-radius:var(--radius-sm);display:grid;gap:7px}.receipt-upload input{font-size:12px}.receipt-upload small{color:var(--gray-500);font-size:11px}.receipt-name{font-size:11px;color:var(--camo-dark);font-weight:600}
 .shop-toolbar{max-width:var(--max-width);margin:-20px auto 28px;display:flex;justify-content:space-between;align-items:center;color:var(--gray-500);font-size:11px;text-transform:uppercase;letter-spacing:1.5px}.shop-toolbar select{border:1px solid var(--gray-100);background:var(--white);padding:10px 14px;font:inherit;color:var(--black);outline:none}@media(max-width:600px){.shop-toolbar{margin:-8px 0 24px}.shop-toolbar select{padding:9px 10px}}
+
+/* ===================== MOBILE NAVIGATION FIX ===================== */
+@media (max-width: 768px) {
+  .nav {
+    background: #1d291a !important;
+    background-color: #1d291a !important;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    z-index: 1000;
+  }
+
+  .nav-links,
+  .nav-links.open {
+    background: #1d291a !important;
+    background-color: #1d291a !important;
+    opacity: 1 !important;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    z-index: 999;
+    isolation: isolate;
+  }
+
+  .nav-links::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: #1d291a;
+    z-index: -1;
+  }
+
+  .nav-links a {
+    color: #f7f3eb !important;
+  }
+
+  .nav-links a:hover,
+  .nav-links a.active {
+    color: #e8d8aa !important;
+  }
+}
